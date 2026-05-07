@@ -32,6 +32,12 @@ public class AdminPanelTeachers {
     private ComboBox<SchoolClass> classFilterCombo;
     private ObservableList<SchoolClass> allClassFilters;
     private boolean syncingFilters = false;
+    private VBox detailsPane;
+    private Label detailNameValue;
+    private Label detailUserValue;
+    private Label detailPhoneValue;
+    private Label detailClassesValue;
+    private Label detailSubjectsValue;
 
     public AdminPanelTeachers(BorderPane mainPane) {
         this.mainPane = mainPane;
@@ -89,6 +95,19 @@ public class AdminPanelTeachers {
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         createColumns();
         loadTeachers();
+        tableView.setRowFactory(tv -> {
+            TableRow<Teacher> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    updateDetails(row.getItem());
+                }
+            });
+            return row;
+        });
+
+        detailsPane = buildDetailsPane();
+        HBox tableRow = new HBox(12, tableView, detailsPane);
+        HBox.setHgrow(tableView, Priority.ALWAYS);
 
         // Setup filters
         Runnable applyFilters = () -> {
@@ -144,9 +163,63 @@ public class AdminPanelTeachers {
         });
         classFilterCombo.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters.run());
 
-        contentBox.getChildren().addAll(titleLabel, searchBox, buttonBox, tableView);
-        VBox.setVgrow(tableView, Priority.ALWAYS);
+        contentBox.getChildren().addAll(titleLabel, searchBox, buttonBox, tableRow);
+        VBox.setVgrow(tableRow, Priority.ALWAYS);
         mainPane.setCenter(contentBox);
+    }
+
+    private VBox buildDetailsPane() {
+        VBox pane = new VBox(8);
+        pane.setPrefWidth(280);
+        pane.setMinWidth(260);
+        pane.setStyle("-fx-background-color: #ffffff; -fx-border-color: #c9d8e6; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12;");
+
+        Label title = new Label("Détails enseignant");
+        title.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
+
+        detailNameValue = new Label("cliquer sur un enseignant");
+        detailUserValue = new Label("-");
+        detailPhoneValue = new Label("-");
+        detailClassesValue = new Label("-");
+        detailSubjectsValue = new Label("-");
+
+        detailClassesValue.setWrapText(true);
+        detailSubjectsValue.setWrapText(true);
+
+        pane.getChildren().addAll(
+            title,
+            labeledRow("Nom :", detailNameValue),
+            labeledRow("Identifiant :", detailUserValue),
+            labeledRow("Téléphone :", detailPhoneValue),
+            labeledRow("Classes :", detailClassesValue),
+            labeledRow("Matières :", detailSubjectsValue)
+        );
+        return pane;
+    }
+
+    private HBox labeledRow(String labelText, Label valueLabel) {
+        Label label = new Label(labelText);
+        label.setMinWidth(90);
+        HBox row = new HBox(6, label, valueLabel);
+        row.setAlignment(Pos.CENTER_LEFT);
+        return row;
+    }
+
+    private void updateDetails(Teacher teacher) {
+        if (teacher == null) {
+            detailNameValue.setText("Double-cliquez un enseignant");
+            detailUserValue.setText("-");
+            detailPhoneValue.setText("-");
+            detailClassesValue.setText("-");
+            detailSubjectsValue.setText("-");
+            return;
+        }
+
+        detailNameValue.setText(teacher.getFullName());
+        detailUserValue.setText(teacher.getNomUtilisateur());
+        detailPhoneValue.setText(teacher.getTelephone() == null || teacher.getTelephone().isBlank() ? "-" : teacher.getTelephone());
+        detailClassesValue.setText(teacher.getClassesAffectees());
+        detailSubjectsValue.setText(teacher.getMatieresAffectees());
     }
 
     private void createColumns() {
@@ -166,11 +239,7 @@ public class AdminPanelTeachers {
         userCol.setCellValueFactory(new PropertyValueFactory<>("nomUtilisateur"));
         userCol.setStyle("-fx-alignment: CENTER;");
 
-        TableColumn<Teacher, String> classesCol = new TableColumn<>("Classes assignees");
-        classesCol.setCellValueFactory(new PropertyValueFactory<>("classesAffectees"));
-        classesCol.setStyle("-fx-alignment: CENTER;");
-
-        tableView.getColumns().addAll(nomCol, prenomCol, telCol, userCol, classesCol);
+        tableView.getColumns().addAll(nomCol, prenomCol, telCol, userCol);
     }
 
     private void loadTeachers() {
