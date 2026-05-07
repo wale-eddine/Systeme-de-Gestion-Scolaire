@@ -74,7 +74,7 @@ public class AdminPanelAssignments {
         classFilterCombo.setOnAction(e -> applyFilters());
         subjectFilterCombo.setOnAction(e -> applyFilters());
 
-        grid.add(new Label("Enseignant :"), 0, 0);
+        grid.add(new Label("Enseignant :"), 0, 0); 
         grid.add(teacherCombo, 1, 0);
         grid.add(new Label("Niveau :"), 2, 0);
         grid.add(levelCombo, 3, 0);

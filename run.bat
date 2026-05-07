@@ -39,6 +39,9 @@ if %errorlevel% neq 0 (
     pause
     exit /b 1
 )
+REM Copy CSS resources to output folder
+if not exist "bin\application" mkdir "bin\application"
+copy /Y "src\application\application.css" "bin\application\application.css" >nul
 REM Run the application with SQLite JDBC in classpath
 java --module-path "C:\Program Files\javafx-sdk-21.0.10\lib;bin" --add-modules javafx.controls,javafx.graphics,javafx.fxml -cp "lib\*" -m TP_JavaFX/application.Main
 pause
