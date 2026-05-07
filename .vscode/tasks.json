@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Compile JavaFX",
+      "type": "shell",
+      "command": "javac --module-path \"C:\\Program Files\\javafx-sdk-21.0.10\\lib\" --add-modules javafx.controls,javafx.graphics,javafx.fxml -d \"${workspaceFolder}\\bin\" \"${workspaceFolder}\\src\\module-info.java\" \"${workspaceFolder}\\src\\application\\Authentification.java\" \"${workspaceFolder}\\src\\application\\GestionClient.java\" \"${workspaceFolder}\\src\\application\\Main.java\" \"${workspaceFolder}\\src\\application\\MenuGeneral.java\"",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$javac"
+    }
+  ]
+}

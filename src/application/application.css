@@ -1,0 +1,94 @@
+.root {
+	-fx-font-family: "Segoe UI";
+	-fx-background-color: linear-gradient(to bottom, #dfeeff, #f6f9fc 55%, #e6edf5);
+}
+
+.label {
+	-fx-text-fill: #213547;
+}
+
+.button {
+	-fx-background-color: linear-gradient(to bottom, #1e88e5, #1565c0);
+	-fx-text-fill: white;
+	-fx-font-weight: bold;
+	-fx-background-radius: 10;
+	-fx-padding: 8 16;
+}
+
+.button:hover {
+	-fx-background-color: linear-gradient(to bottom, #42a5f5, #1976d2);
+}
+
+.text-field,
+.password-field,
+.combo-box-base,
+.spinner {
+	-fx-background-color: white;
+	-fx-background-radius: 10;
+	-fx-border-color: #c8d6e5;
+	-fx-border-radius: 10;
+	-fx-padding: 7 10;
+}
+
+.table-view {
+	-fx-background-color: #f4f8fd;
+	-fx-control-inner-background: #f4f8fd;
+	-fx-control-inner-background-alt: #e9f0f8;
+	-fx-border-color: #b9cadc;
+	-fx-border-radius: 12;
+	-fx-background-radius: 12;
+}
+
+.table-view .column-header-background {
+	-fx-background-color: linear-gradient(to right, #5b86c5, #4f72b8);
+}
+
+.table-view .column-header,
+.table-view .filler {
+	-fx-background-color: transparent;
+}
+
+.table-view .column-header .label {
+	-fx-font-weight: bold;
+	-fx-text-fill: white;
+}
+
+.menu-bar {
+	-fx-background-color: linear-gradient(to right, #183b6b, #305f9a);
+}
+
+.menu-bar .menu > .label {
+	-fx-text-fill: white;
+}
+
+.menu-bar .menu:hover,
+.menu-bar .menu:showing {
+	-fx-background-color: rgba(255, 255, 255, 0.14);
+}
+
+.context-menu {
+	-fx-background-color: #f4f8fd;
+	-fx-border-color: #b9cadc;
+	-fx-background-radius: 10;
+	-fx-border-radius: 10;
+}
+
+.context-menu .menu-item .label {
+	-fx-text-fill: #213547;
+}
+
+.context-menu .menu-item:focused {
+	-fx-background-color: #4f72b8;
+}
+
+.context-menu .menu-item:focused .label {
+	-fx-text-fill: white;
+}
+
+.scroll-pane {
+	-fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+	-fx-background-color: transparent;
+}
