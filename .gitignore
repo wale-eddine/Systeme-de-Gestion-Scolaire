@@ -1,0 +1,28 @@
+# Java build output
+/bin/
+/out/
+/target/
+/build/
+/dist/
+
+# IDE metadata
+/.classpath
+/.project
+/.settings/
+/.metadata/
+
+# VS Code (keep shared configs)
+/.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Databases
+*.db
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
