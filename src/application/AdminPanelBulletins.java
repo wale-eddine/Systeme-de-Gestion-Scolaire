@@ -85,68 +85,33 @@ public class AdminPanelBulletins {
             return;
         }
 
-        if (selectedStudent == null) {
-            showError("Veuillez sélectionner un élève.");
-            return;
-        }
-
         if (semester == null) {
             showError("Veuillez sélectionner un trimestre.");
             return;
         }
 
+        AnneeScolaire currentAnnee = MenuGeneral.getCurrentAnnee();
+        if (currentAnnee == null) {
+            showError("Veuillez d'abord sélectionner une année scolaire en haut à droite.");
+            return;
+        }
+
         StringBuilder result = new StringBuilder();
         try {
-            result.append("================================================\n");
-            result.append("BULLETIN - ").append(selectedStudent.getFullName()).append("\n");
-            result.append("Classe : ").append(selectedClass.getNomClasse()).append("\n");
-            result.append("Trimestre : ").append(semester).append("\n");
-            result.append("================================================\n\n");
-
-            // Get all subjects for this class's level
             List<Subject> subjects = SubjectDAO.getSubjectsByLevel(selectedClass.getIdNiveau());
-            
-            double totalScore = 0;
-            int count = 0;
 
-            for (Subject subject : subjects) {
-                try {
-                    AnneeScolaire currentAnnee = MenuGeneral.getCurrentAnnee();
-                    if (currentAnnee == null) {
-                        showError("Veuillez d'abord sélectionner une année scolaire en haut à droite.");
-                        return;
-                    }
-                    Grade grade = GradeDAO.getStudentGradeForSubjectAndTrimester(
-                        selectedStudent.getIdEleve(), subject.getIdMatiere(), currentAnnee.getIdAnnee(), semester);
-
-                    if (grade != null) {
-                        result.append(subject.getNomMatiere()).append(": ").append(grade.getValeur()).append("/20\n");
-                        totalScore += grade.getValeur();
-                        count++;
-                    } else {
-                        result.append(subject.getNomMatiere()).append(": Non noté\n");
-                    }
-                } catch (Exception e) {
-                    result.append(subject.getNomMatiere()).append(": Non noté\n");
+            if (selectedStudent == null || selectedStudent.getIdEleve() == -1) {
+                List<Student> classStudents = StudentDAO.getStudentsByClass(selectedClass.getIdClasse());
+                for (Student student : classStudents) {
+                    result.append(buildBulletinForStudent(student, selectedClass, currentAnnee, semester, subjects));
+                    result.append("\n");
                 }
+                resultArea.setText(result.toString());
+                showInfo("Bulletins de la classe générés avec succès !");
+                return;
             }
 
-            if (count > 0) {
-                double average = totalScore / count;
-                result.append("\nMoyenne générale : ").append(String.format("%.2f", average)).append("/20\n");
-
-                // Calculate rank
-                try {
-                    List<Student> classStudents = StudentDAO.getStudentsByClass(selectedClass.getIdClasse());
-                    int rank = calculateRank(classStudents, subjects, semester, selectedStudent, average);
-                    result.append("Rang dans la classe : ").append(rank).append("/").append(classStudents.size()).append("\n");
-                } catch (Exception e) {
-                    result.append("Rang : N/A\n");
-                }
-            }
-
-            result.append("\n");
-
+            result.append(buildBulletinForStudent(selectedStudent, selectedClass, currentAnnee, semester, subjects));
             resultArea.setText(result.toString());
             showInfo("Bulletin généré avec succès !");
 
@@ -154,6 +119,52 @@ public class AdminPanelBulletins {
             showError("Erreur lors de la génération du bulletin : " + e.getMessage());
             resultArea.setText("Erreur : " + e.getMessage());
         }
+    }
+
+    private String buildBulletinForStudent(Student student, SchoolClass selectedClass, AnneeScolaire currentAnnee,
+                                           int semester, List<Subject> subjects) {
+        StringBuilder result = new StringBuilder();
+        result.append("================================================\n");
+        result.append("BULLETIN - ").append(student.getFullName()).append("\n");
+        result.append("Année scolaire : ").append(currentAnnee.getNom()).append("\n");
+        result.append("Classe : ").append(selectedClass.getNomClasse()).append("\n");
+        result.append("Trimestre : ").append(semester).append("\n");
+        result.append("================================================\n\n");
+
+        double totalScore = 0;
+        int count = 0;
+
+        for (Subject subject : subjects) {
+            try {
+                Grade grade = GradeDAO.getStudentGradeForSubjectAndTrimester(
+                    student.getIdEleve(), subject.getIdMatiere(), currentAnnee.getIdAnnee(), semester);
+
+                if (grade != null) {
+                    result.append(subject.getNomMatiere()).append(": ").append(grade.getValeur()).append("/20\n");
+                    totalScore += grade.getValeur();
+                    count++;
+                } else {
+                    result.append(subject.getNomMatiere()).append(": Non noté\n");
+                }
+            } catch (Exception e) {
+                result.append(subject.getNomMatiere()).append(": Non noté\n");
+            }
+        }
+
+        if (count > 0) {
+            double average = totalScore / count;
+            result.append("\nMoyenne générale : ").append(String.format("%.2f", average)).append("/20\n");
+
+            try {
+                List<Student> classStudents = StudentDAO.getStudentsByClass(selectedClass.getIdClasse());
+                int rank = calculateRank(classStudents, subjects, semester, student, average);
+                result.append("Rang dans la classe : ").append(rank).append("/").append(classStudents.size()).append("\n");
+            } catch (Exception e) {
+                result.append("Rang : N/A\n");
+            }
+        }
+
+        return result.toString();
     }
 
     private int calculateRank(List<Student> students, List<Subject> subjects, int semester, 
@@ -213,8 +224,11 @@ public class AdminPanelBulletins {
     private void loadStudentsByClass(SchoolClass schoolClass, ComboBox<Student> combo) {
         try {
             List<Student> students = StudentDAO.getStudentsByClass(schoolClass.getIdClasse());
-            ObservableList<Student> items = FXCollections.observableArrayList(students);
+            ObservableList<Student> items = FXCollections.observableArrayList();
+            items.add(new Student(-1, "les eleves", "Tous", null, "", ""));
+            items.addAll(students);
             combo.setItems(items);
+            combo.setValue(null);
         } catch (Exception e) {
             showError("Erreur de chargement des élèves : " + e.getMessage());
         }
